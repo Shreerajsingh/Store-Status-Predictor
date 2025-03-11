@@ -38,7 +38,9 @@ function appendStoreData(storeDataRow) {
 
 async function createFile(filePath) {
     try {
-        fs.writeFileSync(filePath, headers.join(",") + "\n");
+        await fs.writeFileSync(filePath, headers.join(",") + "\n");
+
+        
 
         return `${filePath}`;
     } catch (error) {
@@ -51,7 +53,7 @@ async function appendData(filePath, dataRow){
         const fileExists = fs.existsSync(filePath);
 
         if (!fileExists) {
-            createFile(filePath);
+            await createFile(filePath);
         }
 
         const newRow = {
