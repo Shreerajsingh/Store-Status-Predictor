@@ -13,10 +13,18 @@ module.exports = {
       store_id: { type: Sequelize.STRING, allowNull: false },
       uptime_last_hour: { type: Sequelize.STRING, allowNull: false },
       uptime_last_day: { type: Sequelize.STRING, allowNull: false },
-      update_last_week: { type: Sequelize.STRING, allowNull: false },
+      uptime_last_week: { type: Sequelize.STRING, allowNull: false },
       downtime_last_hour: { type: Sequelize.STRING, allowNull: false },
       downtime_last_day: { type: Sequelize.STRING, allowNull: false },
-      downtime_last_week: { type: Sequelize.STRING, allowNull: false }
+      downtime_last_week: { type: Sequelize.STRING, allowNull: false },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
     });
   },
   async down(queryInterface, Sequelize) {

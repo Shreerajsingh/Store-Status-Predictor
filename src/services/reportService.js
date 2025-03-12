@@ -1,35 +1,32 @@
 const { DateTime, Interval } = require("luxon");
 const { loadFiles } = require('../utils/dataFilesLoader');
 const { defalutTimeZone, defaultBusinessHours } = require('../utils/defaultData');
+const fastCsv = require("fast-csv");
+const { PassThrough } = require("stream");
 
 const { Report } = require('../models');
 const { report_status } = require('../models');
-
 const CrudRepository = require('../repositories/crud-repository');
-const reportRepo = new CrudRepository( Report );
 const reportStatusRepo = new CrudRepository( report_status );
 
-async function generateReport(id, reportID) {
+
+async function generateReport(id, reportId) {
     try {
-        console.log(55, reportID);
-        
-        helper1(reportID)
-
-        await reportStatusRepo.update(id, {reportID: reportID, status: 'Complete'});
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-async function helper1(reportId) {
-    const { Business_Hours, Store_Status, Timezones } = await loadFiles();
+        const { Business_Hours, Store_Status, Timezones } = await loadFiles();
 
         for (const row of Timezones) {
             const store_id = row.store_id;
             const timezone = row.timezone_str || defalutTimeZone.timeZone;
 
-            helper(store_id, reportId, timezone, Store_Status, Business_Hours);
+            await helper(store_id, reportId, timezone, Store_Status, Business_Hours);
         }
+
+        await reportStatusRepo.update(id, {reportID: reportId, status: 'Complete'});
+    } catch (error) {
+        console.error(error);
+        await reportStatusRepo.update(id, {reportID: reportId, status: 'Complete'});
+        return error;
+    }
 }
 
 async function helper(store_id, reportId, timezone, Store_Status, Business_Hours) {
@@ -158,20 +155,13 @@ async function helper(store_id, reportId, timezone, Store_Status, Business_Hours
             store_id: store_id,
             uptime_last_hour: `${LHU}`,
             uptime_last_day: `${LDU}`,
-            update_last_week: `${LWU}`,
+            uptime_last_week: `${LWU}`,
             downtime_last_hour: `${LHD}`,
             downtime_last_day: `${LDD}`,
             downtime_last_week:`${LWD}`
         };
-        // console.log(result);
-        // console.log(typeof result.report_name);
-
-        // console.log(result);
-        const y = await reportRepo.getAll();
-        console.log(y);
-        const x = await reportRepo.create(result);
-        console.log(x);
-        // console.log(result);
+        
+        await Report.create(result);
     } catch (error) {
         console.log( error);
     }
@@ -179,17 +169,35 @@ async function helper(store_id, reportId, timezone, Store_Status, Business_Hours
 
 async function getReport(reportId) {
     try {
-        const response = reportRepo.get(reportId);
+        const reportStatus = await reportStatusRepo.get(reportId);
 
-        if(response.status == 'Running') {
-            return { status: 'Running' }
+        if (!reportStatus || reportStatus.status === 'Running') {
+            return { status: 'Running' };
         }
+    
+        const data = await Report.findAll({
+            attributes: [
+                "report_name",
+                "store_id",
+                "uptime_last_hour",
+                "uptime_last_day",
+                "uptime_last_week",
+                "downtime_last_hour",
+                "downtime_last_day",
+                "downtime_last_week"
+            ],
+            where: { report_name: String(reportId) },
+            raw: true,
+        });
 
-        
+        return { status: 'Complete', csv_data: data };
+
     } catch (error) {
-        
+        console.error("Error generating CSV:", error);
+        throw new Error("Internal Server Error");
     }
 }
+
 
 module.exports = {
     generateReport,

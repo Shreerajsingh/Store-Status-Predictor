@@ -14,14 +14,38 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Report.init({
-    report_name: { type: DataTypes.STRING, allowNull: false },
-    store_id: { type: DataTypes.STRING, allowNull: false },
-    uptime_last_hour: { type: DataTypes.STRING, allowNull: false },
-    uptime_last_day: { type: DataTypes.STRING, allowNull: false },
-    update_last_week: { type: DataTypes.STRING, allowNull: false },
-    downtime_last_hour: { type: DataTypes.STRING, allowNull: false },
-    downtime_last_day: { type: DataTypes.STRING, allowNull: false },
-    downtime_last_week: { type: DataTypes.STRING, allowNull: false }
+    report_name: { 
+      type: DataTypes.STRING, 
+      allowNull: false 
+    },
+    store_id: { 
+      type: DataTypes.STRING, 
+      allowNull: false 
+    },
+    uptime_last_hour: { 
+      type: DataTypes.STRING, 
+      allowNull: false 
+    },
+    uptime_last_day: { 
+      type: DataTypes.STRING, 
+      allowNull: false 
+    },
+    uptime_last_week: { 
+      type: DataTypes.STRING, 
+      allowNull: false 
+    },
+    downtime_last_hour: { 
+      type: DataTypes.STRING, 
+      allowNull: false 
+    },
+    downtime_last_day: { 
+      type: DataTypes.STRING, 
+      allowNull: false 
+    },
+    downtime_last_week: { 
+      type: DataTypes.STRING, 
+      allowNull: false 
+    }
   }, {
     sequelize,
     modelName: 'Report',

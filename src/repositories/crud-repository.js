@@ -6,11 +6,11 @@ class CrudRepository {
     async create(data) {
         try {
             const response = await this.model.create(data);
-
-            console.log("create         ",response);
+            console.log("Record created:", response);
             return response;
         } catch (error) {
-            console.log("hehe",  error);
+            console.error("Error creating record:", error);
+            throw error;
         }
     }
 
@@ -26,8 +26,8 @@ class CrudRepository {
         return response;
     }
 
-    async get(id) {
-        const response = await this.model.findByPk(id);
+    async get(reportId) {
+        const response = await this.model.findOne({ where: { report_name: reportId } });
         if(!response) {
             throw new AppError('Not able to fund the resource', StatusCodes.NOT_FOUND);
         }

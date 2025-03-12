@@ -6,14 +6,12 @@ const reportStatusRepo = new CrudRepository( report_status );
 
 async function generateReport(req, res) {
     try {
-        console.log(111);
         const report = await reportStatusRepo.create({status: 'Running'});
         const reportId = report.report_name;
-        console.log(84, reportId, report);
         
         ReportService.generateReport(report.id, reportId);
 
-        return res.status().json({reportId: reportId});
+        return res.status(201).json({reportId: reportId});
     } catch (error) {
         return error;
     }
@@ -21,10 +19,9 @@ async function generateReport(req, res) {
 
 async function getReport(req, res) {
     try {
-        const { reportId } = req.body;
-        const response = await ReportService.getReport(reportId);
-
-        return res.status().json( response );
+        const reportId = req.params.id;
+        const report = await ReportService.getReport(reportId);
+        return res.status(201).json(report);
     } catch (error) {
         return error;
     }
